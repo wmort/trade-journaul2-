@@ -418,7 +418,11 @@
     const entry = parseFloat(t.entry), exit = parseFloat(t.exit);
     if (isNaN(entry) || isNaN(exit)) return null;
     const pointsMoved = t.direction === 'long' ? (exit - entry) : (entry - exit);
-    return pointsMoved * pointValueFor(t.symbol) * contracts;
+    // Use the contracts logged with the trade when present (ORB sizes vary per trade);
+    // otherwise fall back to the Contracts setting.
+    const q = parseFloat(t.qty);
+    const n = (!isNaN(q) && q > 0) ? q : contracts;
+    return pointsMoved * pointValueFor(t.symbol) * n;
   }
   function enriched() {
     return trades.map(t => {
